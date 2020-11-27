@@ -1,0 +1,78 @@
+
+	Mounting Google Drive in your VM
+
+from google.colab import drive
+drive.mount('/gdrive')
+
+
+	Import PyDrive and Associated Libraries
+
+# Import PyDrive and associated libraries.
+# This only needs to be done once in a notebook.
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from google.colab import auth
+from oauth2client.client import GoogleCredentials
+
+
+
+	Authenticating Drive with Colab
+
+# Authenticate and create the PyDrive client.
+# This only needs to be done once in a notebook.
+auth.authenticate_user()
+gauth = GoogleAuth()
+gauth.credentials = GoogleCredentials.get_application_default()
+drive = GoogleDrive(gauth)
+
+
+
+	Writting File to the Drive
+
+with open('/gdrive/My Drive/foo.txt', 'w') as f:
+  f.write('Hello Google Drive!')
+!cat '/gdrive/My Drive/foo.txt'
+
+
+
+	Create and Upload a file to the drive
+
+# Create & upload a text file.
+uploaded = drive.CreateFile({'title': 'Sample file.txt'})
+uploaded.SetContentString('Sample upload file content')
+uploaded.Upload()
+print('Uploaded file with ID {}'.format(uploaded.get('id')))
+
+
+
+	Listing file in Google Drive
+
+# List .txt files in the root.
+#
+# Search query reference:
+# https://developers.google.com/drive/v2/web/search-parameters
+listed = drive.ListFile({'q': "title contains '.txt' and 'root' in parents"}).GetList()
+for file in listed:
+  print('title {}, id {}'.format(file['title'], file['id']))
+	
+
+
+	Downloading files or importing data from Google Drive	
+
+# Download a file based on its file ID.
+#
+# A file ID looks like: laggVyWshwcyP6kEI-y_W3P8D26sz
+file_id = 'REPLACE_WITH_YOUR_FILE_ID'
+downloaded = drive.CreateFile({'id': file_id})
+print('Downloaded content "{}"'.format(downloaded.GetContentString()))
+
+
+
+	Downloading files to your local file system
+
+rom google.colab import files
+
+with open('example.txt', 'w') as f:
+  f.write('some content')
+
+files.download('example.txt')
